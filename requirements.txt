@@ -1,0 +1,7 @@
+mujoco-py
+numpy
+scipy
+cloudpickle
+cython
+sympy
+requests

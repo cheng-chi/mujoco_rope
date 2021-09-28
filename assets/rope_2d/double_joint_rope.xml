@@ -1,0 +1,66 @@
+<!-- NOTE: the joint limits and references have not been set. If using -->
+<!-- this to control a real ur5, make sure they align with the values -->
+<!-- used in the real arm firmware -->
+<!-- Masses and center-of-masses taken from: www.universal-robots.com/
+        how-tos-and-faqs/faq/ur-faq/
+        parameters-for-calculations-of-kinematics-and-dynamics-45257/ -->
+<!-- Principle moments of inertia not provided, set all to 0.1. -->
+<!-- Inertia parameters provided at link below, not sure of accuracy so not used:
+        http://hades.mech.northwestern.edu/images/4/49/UR5-URDF.pdf -->
+<mujoco model="ur5">
+    <compiler angle="radian" balanceinertia="true"/>
+    <option density="1.2" viscosity="0.00002"/>
+
+    <default>
+        <light castshadow="false" diffuse="1 1 1" />
+        <camera fovy="60" />
+    </default>
+
+    <custom>
+        <numeric name="START_ANGLES" data="0 0"/>
+        <numeric name="N_GRIPPER_JOINTS" data="0" />
+    </custom>
+
+    <asset>
+        <material name="silver" specular="1" shininess="0.5" reflectance="1" emission="0.25" rgba="0.82 0.82 0.82 1"/>
+        <material name="grey" specular="1" shininess="0.5" reflectance="1" emission="0.1" rgba="0.5 0.5 0.5 1"/>
+        <material name="blue" specular="1" shininess="0.5" reflectance="1" emission="0" rgba="0.678 0.847 0.902 1"/>
+        <material name="black" specular="1" shininess="0.5" reflectance="1" emission="0" rgba="0.2 0.2 0.2 1"/>
+    </asset>
+
+    <worldbody>
+        <body name="hand" pos="0 0 -0.15" mocap="true">
+            <geom type="box" size=".002 .004 .006" rgba="0 .9 0 .5" contype="2" conaffinity="2"/>
+        </body>
+
+        <light directional="true" pos="-0.5 0.5 3" dir="0 0 -1" />
+
+        <body name="base_link" pos="0 0 0" euler="0 0 0">
+            <body name="link0" pos="0 0 0">
+                <joint name="joint0" axis="0 1 0" pos="0 0 0" armature="1000.0"/>
+                <inertial pos="0 0 -0.15" mass="1.6" diaginertia="0.01 0.01 0.01"/>
+                <geom type="capsule" size=".02 .15" pos="0 0 -.15" rgba=".8 .2 .1 1"/>
+
+                <body name="link1" pos="0 0 -.3">
+                    <joint name="joint1" axis="0 1 0" pos="0 0 0" armature="1000.0"/>
+                    <inertial pos="0 0 -0.25" mass="0.8" diaginertia="0.005 0.005 0.005"/>
+                    <geom type="capsule" size=".02 .25" pos="0 0 -.25" rgba=".8 .2 .1 1"/>
+
+                    <body name="EE" pos="0 0 -.5" euler="0 0 0">
+                        <body name="B0" pos="0 0 -0.01" euler="0 1.571 0">
+                            <composite type="rope" count="25 1 1" spacing="0.04">
+                                <joint kind="main" stiffness="0.00491" damping="0.00171"/>
+                                <geom type="capsule" size=".01 .02" rgba=".8 .2 .1 1" mass="0.0006"/>
+                            </composite>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <motor name="joint0_motor" joint="joint0"/>
+        <motor name="joint1_motor" joint="joint1"/>
+    </actuator>
+</mujoco>
